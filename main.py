@@ -5,6 +5,7 @@ from aiogram.dispatcher.filters import Text
 from aiogram_calendar import simple_cal_callback, SimpleCalendar # pip install aiogram-calendar
 import datetime
 from config import API_TOKEN
+from loguru import logger
 
 # API_TOKEN = '' uncomment and insert your telegram bot API key here
 
@@ -13,6 +14,9 @@ from config import API_TOKEN
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
 
+logger.add('ihfo.log', format="{time} {level} {message}", level="INFO",
+           rotation="1 week", compression="zip")
+
 # star keybord ('Сегодня', 'Выбрать Дату', 'Помощь')
 start_kb = ReplyKeyboardMarkup(resize_keyboard=True,)
 start_kb.row('Сегодня', 'Выбрать Дату', 'Помощь')
@@ -20,6 +24,7 @@ start_kb.row('Сегодня', 'Выбрать Дату', 'Помощь')
 
 @dp.message_handler(commands=['start'])
 async def cmd_start(message: Message):
+    logger.info(f'Пользователь {message.from_user.id} начал взаимодействие')
     await message.reply('Введите дату и получите новую дату через 126 календарных дней',
                         reply_markup=start_kb)
 
@@ -35,6 +40,7 @@ async def process_simple_calendar(callback_query: CallbackQuery, callback_data: 
     selected, date = await SimpleCalendar().process_selection(callback_query, callback_data)
     future = date + datetime.timedelta(days=125)
     if selected:
+        logger.info(f'Пользователь {callback_query.message.from_user.id} нажал "Календарь"')
         await callback_query.message.answer(
             f'Вы выбрали: {date.strftime("%d.%m.%Y")}\nЧерез 126 дней: {future.strftime("%d.%m.%Y")}',
             reply_markup=start_kb
@@ -43,6 +49,7 @@ async def process_simple_calendar(callback_query: CallbackQuery, callback_data: 
 
 @dp.message_handler(Text(equals=['Сегодня'], ignore_case=True))
 async def simple_cal_handler(message: Message):
+    logger.info(f'Пользователь {message.from_user.id} нажал "Сегодня"')
     now = datetime.datetime.now()
     future = now + datetime.timedelta(days=125) # на один день меньше, так как счет не с 0, а с 1.
     future_date = future.strftime('%d.%m.%Y')
@@ -51,6 +58,7 @@ async def simple_cal_handler(message: Message):
 
 @dp.message_handler(Text(equals=['Помощь'], ignore_case=True))
 async def simple_cal_handler(message: Message):
+    logger.info(f'Пользователь {message.from_user.id} нажал "Помощь"')
     await message.answer(f'Лучше звоните <a href="https://t.me/ImAntonbatura">Антону</a>',
                              parse_mode=ParseMode.HTML)
 
