@@ -40,9 +40,9 @@ async def cmd_start(message: Message):
 
 @dp.message_handler(Text(equals=['Выбрать Дату'], ignore_case=True))
 async def nav_cal_handler(message: Message):
+    logger.info(f'Пользователь {message.from_user.id} нажал "Календарь"')
     await message.answer("Выберите дату: ", reply_markup=await SimpleCalendar().start_calendar())
     asyncio.create_task(delete_message(message, 5))
-    # asyncio.create_task(delete_message(answer, 5))
 
 
 # simple calendar usage
@@ -51,7 +51,6 @@ async def process_simple_calendar(callback_query: CallbackQuery, callback_data: 
     selected, date = await SimpleCalendar().process_selection(callback_query, callback_data)
     future = date + datetime.timedelta(days=125)
     if selected:
-        logger.info(f'Пользователь {callback_query.message.from_user.id} нажал "Календарь"')
         answer = await callback_query.message.answer(f'Вы выбрали: {date.strftime("%d.%m.%Y")}\n'
                                                      f'Через 126 дней: {future.strftime("%d.%m.%Y")}')
         asyncio.create_task(delete_message(callback_query.message, 5))

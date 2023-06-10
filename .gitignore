@@ -1,5 +1,7 @@
 config.py
 info.log
+*.log.zip
+.idea/
 ### Python template
 # Byte-compiled / optimized / DLL files
 __pycache__/
