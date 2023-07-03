@@ -6,15 +6,19 @@ from aiogram.utils.exceptions import MessageCantBeDeleted, MessageToDeleteNotFou
 from aiogram_calendar import simple_cal_callback, SimpleCalendar  # pip install aiogram-calendar
 from contextlib import suppress
 import datetime
-from config import API_TOKEN
 from loguru import logger
 import asyncio
+import os
+from dotenv import load_dotenv
 
-# API_TOKEN = '' uncomment and insert your telegram bot API key here
+
+# API_TOKEN
+load_dotenv()
+api_token = os.getenv('API_TOKEN')
 
 
 # Initialize bot and dispatcher
-bot = Bot(token=API_TOKEN)
+bot = Bot(token=api_token)
 dp = Dispatcher(bot)
 
 logger.add('ihfo.log', format="{time} {level} {message}", level="INFO",
